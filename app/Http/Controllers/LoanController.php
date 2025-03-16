@@ -37,5 +37,72 @@ class LoanController extends Controller
         ], 200);
     
     }
-    
+    public function show($id)
+    {
+        $loan = Loan::find(id);
+
+        if (!$loan) {
+            return response()->json([
+                'status'=> 404,
+                'message'=> 'Loan not found.',
+                'data'=> null
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Loan retrieved successfully.',
+            'data' => $loan
+        ], 200);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $loan = Loan::find($id);
+
+        if (!$loan) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Loan not found.',
+                'data' => null
+            ],404);
+        }
+
+        $request->validate([
+            'book_id' => 'sometimes|integer|exists:books,id',
+            'user_id' => 'sometimes|integer|exists:users,id',
+            'loan_date' => 'sometimes|date',
+            'return_date' => 'nullable|date|after_or_equal:loan_date',
+            'status' => 'sometimes|string|max:255'
+        ]);
+
+        $loan->update($request->all());
+
+        return response()->json([
+            'status'=> 200,
+            'message'=> 'Loan updated successfully.',
+            'data'=> $loan
+        ], 200);
+    }
+
+    public function destroy($id)
+    {
+        $loan = Loan::find($id);
+
+        if (!$loan) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Loan not found.',
+                'data' => null
+            ], 404);
+        }
+
+        $loan->delete();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Loan deleted successfully.',
+            'data' => null
+        ], 200);
+    }
 }
